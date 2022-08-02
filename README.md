@@ -4,6 +4,25 @@ Minimal Spring Boot project that shows how to use gradle and [buildah](https://b
 
 Full blog: 
 
+## Create OCI image with buildah
+
+```
+./gradlew bootJar
+./gradlew buildah
+```
+
+## Run image with podman
+
+```
+./gradlew podman
+```
+
+## Validate podman image running locally
+
+```
+curl http://localhost:8080/info
+```
+
 ## Project initially created using Spring Intializer
 
 [Spring Initializer Web UI](https://start.spring.io/)
