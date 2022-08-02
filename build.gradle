@@ -1,0 +1,90 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'org.fabianlee'
+version = '0.0.2-SNAPSHOT'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+// additional variables
+ext.dockerOwner = 'fabianlee'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+        runtimeOnly 'io.micrometer:micrometer-registry-prometheus:1.9.0'
+        implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// makes BuildProperties available from Spring context
+springBoot {
+    buildInfo()
+}
+
+// for debug purposes
+task defaultProperties { 
+    println "Project: $project" 
+    println "Name: $name" 
+    println "Path: $path" 
+    println "Project directory: $projectDir" 
+    println "Build directory: $buildDir" 
+    println "Version: $version" 
+    println "Group: $project.group" 
+    println "dockerOwner: $project.dockerOwner" 
+    println "Description: $project.description" 
+    println "AntBuilder: $ant" 
+}
+
+// takes templatized Dockerfile, places into buildDir
+task prepareDockerfileTemplate(type: Copy) {
+    group "OCI"
+    dependsOn "bootJar"
+    from "src/main/resources/docker"
+    include "Dockerfile"
+    filter { it.replaceAll('<%=name%>', project.name) }
+    filter { it.replaceAll('<%=version%>', project.version) }
+    into "$buildDir"
+}
+
+task buildah(type: Exec) {
+    group "OCI"
+    dependsOn "prepareDockerfileTemplate"
+    workingDir "${buildDir}"
+    println "Executing 'buildah' task"
+    commandLine "buildah", "bud", "-f", "Dockerfile", "-t", "springbootwithbuildah"
+}
+
+task podmanCleanup(type: Exec) {
+    ignoreExitValue true
+    commandLine "podman", "rm", "springbootwithbuildah"
+}
+task podman(type: Exec) {
+    group "OCI"
+    // buildah does not cache, so do not force rebuild
+    //dependsOn "buildah"
+    dependsOn podmanCleanup
+
+    println ""
+    println "To cleanup, run 'podman rm springbootwithbuildah'"
+    println ""
+    commandLine "podman", "run", "-p", "8080:8080", "-p", "8081:8081", "--name", "springbootwithbuildah", "springbootwithbuildah"
+
+}
+
+
+
