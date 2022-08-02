@@ -1,6 +1,6 @@
 # spring-boot-with-buildah
 
-Minimal Spring Boot project that shows how to use [buildah](https://buildah.io/) to create an OCI-compatible (Docker) image with gradle.
+Minimal Spring Boot project that shows how to use gradle and [buildah](https://buildah.io/) to create an OCI-compatible (Docker) image, then run it with [podman](https://podman.io/).
 
 Full blog: 
 
