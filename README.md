@@ -21,6 +21,10 @@ Full blog:
 
 ```
 curl http://localhost:8080/info
+
+curl -s http://localhost:8080/api/user | jq
+
+curl -s http://localhost:8081/actuator/health | jq
 ```
 
 ## Project initially created using Spring Intializer
