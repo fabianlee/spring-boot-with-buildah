@@ -2,7 +2,7 @@
 
 Minimal Spring Boot project that shows how to use gradle and [buildah](https://buildah.io/) to create an OCI-compatible (Docker) image, then run it with [podman](https://podman.io/).
 
-Full blog: 
+Full blog: https://fabianlee.org/2022/08/03/java-creating-oci-compatible-image-for-spring-boot-web-using-buildah/
 
 ## Create OCI image with buildah
 
